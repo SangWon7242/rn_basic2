@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 
 export default function Posts() {
   // 하드코딩 : 데이터를 직접 작성
@@ -11,10 +11,38 @@ export default function Posts() {
   ];
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      {posts.map((post) => (
-        <Text key={post.id}>{post.title}</Text>
-      ))}
+    <View style={styles.postsContainer}>
+      <FlatList
+        data={posts}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.listWrap}
+        renderItem={({ item }) => (
+          <Text style={styles.postItem}>{item.title}</Text>
+        )}
+      />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  postsContainer: {
+    flex: 1,
+    backgroundColor: "#f5f5f5",
+  },
+  listWrap: {
+    paddingTop: 60,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+  },
+  postItem: {
+    backgroundColor: "white",
+    padding: 16,
+    marginBottom: 12,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+});
