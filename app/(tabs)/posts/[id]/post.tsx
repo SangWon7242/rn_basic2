@@ -1,16 +1,27 @@
 import { useLocalSearchParams } from "expo-router";
-import * as React from "react";
+import { useEffect, useState } from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
+import type { PostWithContentDto } from "../../../types/post";
 
 export default function Post() {
   // useLocalSearchParams : 현재 페이지의 파라미터를 가져온다.
   const { id, title, content } = useLocalSearchParams();
 
+  const [post, setPost] = useState<PostWithContentDto | null>(null);
+
+  useEffect(() => {
+    setPost({
+      id: Number(id),
+      title: title as string, // 타입을 명시적으로 지정
+      content: content as string,
+    });
+  }, []);
+
   return (
     <View style={styles.postContainer}>
       <View style={styles.postInner}>
-        <Text style={styles.postTitle}>{title}</Text>
-        <Text style={styles.postContent}>{content}</Text>
+        <Text style={styles.postTitle}>{post?.title}</Text>
+        <Text style={styles.postContent}>{post?.content}</Text>
       </View>
     </View>
   );
