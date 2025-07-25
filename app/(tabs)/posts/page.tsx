@@ -1,6 +1,7 @@
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
+// type : 타입을 가져오기 위한 키워드
 import type { PostDto } from "../../types/post";
 
 export default function Posts() {
@@ -19,6 +20,15 @@ export default function Posts() {
 
     setPosts(testPosts);
   }, []);
+
+  // 가드 클로즈 패턴
+  if (!posts) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>로딩중...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.postsContainer}>
@@ -43,6 +53,15 @@ export default function Posts() {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
   postsContainer: {
     flex: 1,
     backgroundColor: "#f5f5f5",

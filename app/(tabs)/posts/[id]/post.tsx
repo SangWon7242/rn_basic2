@@ -17,11 +17,20 @@ export default function Post() {
     });
   }, []);
 
+  // 가드 클로즈 패턴
+  if (!post) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>로딩중...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.postContainer}>
       <View style={styles.postInner}>
-        <Text style={styles.postTitle}>{post?.title}</Text>
-        <Text style={styles.postContent}>{post?.content}</Text>
+        <Text style={styles.postTitle}>{post.title}</Text>
+        <Text style={styles.postContent}>{post.content}</Text>
       </View>
     </View>
   );
@@ -30,6 +39,15 @@ export default function Post() {
 const width = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
   postContainer: {
     flex: 1,
     alignItems: "center",
