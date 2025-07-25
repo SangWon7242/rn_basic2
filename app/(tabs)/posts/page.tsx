@@ -3,25 +3,27 @@ import { useEffect, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 
 export default function Posts() {
-  const [posts, setPosts] = useState<{ id: number; title: string }[]>([]);
+  const [posts, setPosts] = useState<
+    { id: number; title: string; content: string }[]
+  >([]);
 
   useEffect(() => {
     setPosts([
-      { id: 1, title: "게시글 1" },
-      { id: 2, title: "게시글 2" },
-      { id: 3, title: "게시글 3" },
-      { id: 4, title: "게시글 4" },
-      { id: 5, title: "게시글 5" },
-      { id: 6, title: "게시글 6" },
-      { id: 7, title: "게시글 7" },
-      { id: 8, title: "게시글 8" },
-      { id: 9, title: "게시글 9" },
-      { id: 10, title: "게시글 10" },
-      { id: 11, title: "게시글 11" },
-      { id: 12, title: "게시글 12" },
-      { id: 13, title: "게시글 13" },
-      { id: 14, title: "게시글 14" },
-      { id: 15, title: "게시글 15" },
+      { id: 1, title: "게시글 1", content: "게시글 1 내용" },
+      { id: 2, title: "게시글 2", content: "게시글 2 내용" },
+      { id: 3, title: "게시글 3", content: "게시글 3 내용" },
+      { id: 4, title: "게시글 4", content: "게시글 4 내용" },
+      { id: 5, title: "게시글 5", content: "게시글 5 내용" },
+      { id: 6, title: "게시글 6", content: "게시글 6 내용" },
+      { id: 7, title: "게시글 7", content: "게시글 7 내용" },
+      { id: 8, title: "게시글 8", content: "게시글 8 내용" },
+      { id: 9, title: "게시글 9", content: "게시글 9 내용" },
+      { id: 10, title: "게시글 10", content: "게시글 10 내용" },
+      { id: 11, title: "게시글 11", content: "게시글 11 내용" },
+      { id: 12, title: "게시글 12", content: "게시글 12 내용" },
+      { id: 13, title: "게시글 13", content: "게시글 13 내용" },
+      { id: 14, title: "게시글 14", content: "게시글 14 내용" },
+      { id: 15, title: "게시글 15", content: "게시글 15 내용" },
     ]);
   }, []);
 
@@ -36,7 +38,7 @@ export default function Posts() {
             style={styles.postItem}
             href={{
               pathname: "/posts/[id]/post", // [id] : 동적 라우팅
-              params: { id: item.id, title: item.title }, // params : 원하는는 파라미터를 전달
+              params: { id: item.id, title: item.title, content: item.content }, // params : 원하는는 파라미터를 전달
             }}
           >
             {item.title}
