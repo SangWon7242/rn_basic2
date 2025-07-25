@@ -1,30 +1,23 @@
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
+import { PostDto } from "../../types/post";
 
 export default function Posts() {
-  const [posts, setPosts] = useState<
-    { id: number; title: string; content: string }[]
-  >([]);
+  const [posts, setPosts] = useState<PostDto[] | null>(null);
 
   useEffect(() => {
-    setPosts([
-      { id: 1, title: "게시글 1", content: "게시글 1 내용" },
-      { id: 2, title: "게시글 2", content: "게시글 2 내용" },
-      { id: 3, title: "게시글 3", content: "게시글 3 내용" },
-      { id: 4, title: "게시글 4", content: "게시글 4 내용" },
-      { id: 5, title: "게시글 5", content: "게시글 5 내용" },
-      { id: 6, title: "게시글 6", content: "게시글 6 내용" },
-      { id: 7, title: "게시글 7", content: "게시글 7 내용" },
-      { id: 8, title: "게시글 8", content: "게시글 8 내용" },
-      { id: 9, title: "게시글 9", content: "게시글 9 내용" },
-      { id: 10, title: "게시글 10", content: "게시글 10 내용" },
-      { id: 11, title: "게시글 11", content: "게시글 11 내용" },
-      { id: 12, title: "게시글 12", content: "게시글 12 내용" },
-      { id: 13, title: "게시글 13", content: "게시글 13 내용" },
-      { id: 14, title: "게시글 14", content: "게시글 14 내용" },
-      { id: 15, title: "게시글 15", content: "게시글 15 내용" },
-    ]);
+    // 해당 코드를 반복문으로 변경
+    const testPosts: PostDto[] = [];
+    for (let i = 1; i <= 15; i++) {
+      testPosts.push({
+        id: i,
+        title: `게시글 ${i}`,
+        content: `게시글 ${i} 내용`,
+      });
+    }
+
+    setPosts(testPosts);
   }, []);
 
   return (
