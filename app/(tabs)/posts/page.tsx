@@ -2,7 +2,7 @@ import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
 // type : 타입을 가져오기 위한 키워드
-import type { PostDto } from "../../types/post";
+import { PostDto } from "../../types/post";
 
 export default function Posts() {
   const [posts, setPosts] = useState<PostDto[] | null>(null);
