@@ -5,16 +5,16 @@ import { PostWithContentDto } from "../../../types/post";
 
 export default function Post() {
   // useLocalSearchParams : 현재 페이지의 파라미터를 가져온다.
-  const { userId, id, title, body } = useLocalSearchParams();
+  const { id, postId, title, content } = useLocalSearchParams();
 
   const [post, setPost] = useState<PostWithContentDto | null>(null);
 
   useEffect(() => {
     setPost({
-      userId: Number(userId),
-      id: Number(id),
+      id: id as string,
+      postId: Number(postId),
       title: title as string, // 타입을 명시적으로 지정
-      body: body as string,
+      content: content as string,
     });
   }, []);
 
@@ -35,7 +35,7 @@ export default function Post() {
           <Text style={styles.postTitleContent}>{post.title}</Text>
         </View>
         <View style={styles.postBodyContainer}>
-          <Text style={styles.postBody}>{post.body}</Text>
+          <Text style={styles.postBody}>{post.content}</Text>
         </View>
       </View>
     </View>

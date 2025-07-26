@@ -2,6 +2,8 @@ import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
 // type : 타입을 가져오기 위한 키워드
+import { db } from "@/firebase/config";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { PostDto } from "../../types/post";
 
 export default function Posts() {
@@ -9,11 +11,26 @@ export default function Posts() {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch(
-        "https://jsonplaceholder.typicode.com/posts"
+      const postsQuery = query(
+        collection(db, "posts"), // collection : posts 컬렉션을 가져온다.
+        orderBy("postId", "desc") // orderBy : id를 기준으로 내림차순 정렬
       );
-      const data = await response.json();
-      setPosts(data);
+
+      // postsSnap : posts 컬렉션의 데이터를 가져온다.
+      const postsSnap = await getDocs(postsQuery);
+
+      const postsData = postsSnap.docs.map((doc) => {
+        const { postId, title, content } = doc.data();
+
+        return {
+          id: doc.id, // doc.id : 문서의 ID
+          postId: Number(postId),
+          title: title as string,
+          content: content as string,
+        };
+      });
+
+      setPosts(postsData);
     } catch (error) {
       console.error(error);
     }
@@ -36,20 +53,20 @@ export default function Posts() {
     <View style={styles.postsContainer}>
       <FlatList
         data={posts}
-        keyExtractor={(post) => post.id.toString()}
+        keyExtractor={(post) => post.id}
         contentContainerStyle={styles.listWrap}
         renderItem={({ item }) => (
           <View style={styles.postItem}>
-            <Text style={styles.postId}>{item.id}번 게시글</Text>
+            <Text style={styles.postId}>{item.postId}번 게시글</Text>
             <Link
               href={{
                 pathname: `/posts/[id]/post`, // [id] : 동적 라우팅
                 params: {
                   // params : 동적 라우팅을 위한 파라미터
-                  userId: item.userId,
                   id: item.id,
+                  postId: item.postId,
                   title: item.title,
-                  body: item.body,
+                  content: item.content,
                 },
               }}
             >
