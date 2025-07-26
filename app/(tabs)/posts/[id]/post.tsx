@@ -1,7 +1,7 @@
+import { PostWithContentDto } from "@/types/post";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
-import { PostWithContentDto } from "../../../types/post";
 
 export default function Post() {
   // useLocalSearchParams : 현재 페이지의 파라미터를 가져온다.

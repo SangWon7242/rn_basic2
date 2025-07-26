@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
 // type : 타입을 가져오기 위한 키워드
 import { db } from "@/firebase/config";
+import { PostDto } from "@/types/post";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
-import { PostDto } from "../../types/post";
 
 export default function Posts() {
   const [posts, setPosts] = useState<PostDto[] | null>(null);
