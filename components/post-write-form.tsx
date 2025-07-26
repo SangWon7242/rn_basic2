@@ -1,5 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 export default function PostWriteForm() {
   const handleSubmit = () => {
@@ -29,22 +38,32 @@ export default function PostWriteForm() {
             </Pressable>
           </View>
         </View>
-        <View style={styles.formBody}>
-          <View style={styles.formTitleContainer}>
-            <TextInput
-              style={styles.formTitleInput}
-              placeholder="제목을 입력해주세요."
-            />
-          </View>
-          <View style={styles.formContentContainer}>
-            <TextInput
-              style={styles.formContentInput}
-              placeholder="여러분의 이야기를 나눠주세요."
-              textAlignVertical="top"
-              multiline
-            />
-          </View>
-        </View>
+        <KeyboardAvoidingView
+          style={styles.formBody}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+        >
+          <ScrollView>
+            <View style={styles.formTitleContainer}>
+              <TextInput
+                style={styles.formTitleInput}
+                placeholder="제목을 입력해주세요."
+                autoFocus={false}
+                showSoftInputOnFocus={true}
+              />
+            </View>
+            <View style={styles.formContentContainer}>
+              <TextInput
+                style={styles.formContentInput}
+                placeholder="여러분의 이야기를 나눠주세요."
+                textAlignVertical="top"
+                autoFocus={false}
+                showSoftInputOnFocus={true}
+                multiline
+              />
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </View>
     </View>
   );
