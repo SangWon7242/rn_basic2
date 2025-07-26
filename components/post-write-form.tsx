@@ -3,6 +3,7 @@ import Octicons from "@expo/vector-icons/Octicons";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -16,6 +17,8 @@ import {
 export default function PostWriteForm() {
   const router = useRouter();
 
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
 
@@ -25,24 +28,51 @@ export default function PostWriteForm() {
     useCallback(() => {
       setTitle("");
       setContent("");
+      setIsLoading(false);
+      setError("");
     }, [])
   );
 
-  const handleSubmit = () => {
-    console.log("완료");
-  };
+  // 폼 유효성 검사
+  const validateForm = useCallback(() => {
+    if (!title.trim()) {
+      setError("제목을 입력해주세요");
+      return false;
+    }
+    if (!content.trim()) {
+      setError("내용을 입력해주세요");
+      return false;
+    }
 
-  const selectCategory = () => {
+    setError("");
+    return true;
+  }, [title, content]);
+
+  const onSubmit = useCallback(() => {
+    if (!validateForm()) {
+      // 오류가 있으면 알림 표시
+      Alert.alert("입력 오류", error);
+      return;
+    }
+
+    console.log("제출된 데이터:", { title, content });
+  }, [title, content]);
+
+  const selectCategory = useCallback(() => {
     console.log("카테고리 선택");
-  };
+  }, []);
 
-  const selectImage = () => {
+  const selectImage = useCallback(() => {
     console.log("사진 선택");
-  };
+  }, []);
 
-  const selectHashtag = () => {
+  const selectHashtag = useCallback(() => {
     console.log("해시태그 선택");
-  };
+  }, []);
+
+  if (isLoading) {
+    return <Text>로딩중...</Text>;
+  }
 
   return (
     <View style={styles.formContainer}>
@@ -53,7 +83,7 @@ export default function PostWriteForm() {
             <Pressable onPress={() => router.navigate("/(tabs)/posts/page")}>
               <Ionicons name="close" size={24} color="black" />
             </Pressable>
-            <Pressable onPress={handleSubmit}>
+            <Pressable onPress={onSubmit}>
               <Text style={styles.formSubmit}>완료</Text>
             </Pressable>
           </View>
