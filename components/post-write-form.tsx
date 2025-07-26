@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import Octicons from "@expo/vector-icons/Octicons";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -14,6 +15,18 @@ import {
 
 export default function PostWriteForm() {
   const router = useRouter();
+
+  const [title, setTitle] = useState<string>("");
+  const [content, setContent] = useState<string>("");
+
+  // useFocusEffect : 화면이 포커스 될 때마다 실행
+  useFocusEffect(
+    // useCallback : 메모이제이션을 사용하여 함수를 재사용
+    useCallback(() => {
+      setTitle("");
+      setContent("");
+    }, [])
+  );
 
   const handleSubmit = () => {
     console.log("완료");
@@ -63,8 +76,10 @@ export default function PostWriteForm() {
               <TextInput
                 style={styles.formTitleInput}
                 placeholder="제목을 입력해주세요."
-                autoFocus={false}
-                showSoftInputOnFocus={true}
+                autoFocus={false} // 자동으로 포커스를 주지 않음
+                showSoftInputOnFocus={true} // 키보드를 띄움
+                value={title}
+                onChangeText={setTitle}
               />
             </View>
             <View style={styles.formContentContainer}>
@@ -72,9 +87,11 @@ export default function PostWriteForm() {
                 style={styles.formContentInput}
                 placeholder="여러분의 이야기를 나눠주세요."
                 textAlignVertical="top"
-                autoFocus={false}
-                showSoftInputOnFocus={true}
-                multiline
+                autoFocus={false} // 자동으로 포커스를 주지 않음
+                showSoftInputOnFocus={true} // 키보드를 띄움
+                multiline // 여러 줄 입력 가능
+                value={content} // 입력값을 저장
+                onChangeText={setContent} // 입력값을 변경할 때 호출
               />
             </View>
           </ScrollView>
