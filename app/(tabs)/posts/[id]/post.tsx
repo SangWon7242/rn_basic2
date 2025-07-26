@@ -5,15 +5,16 @@ import type { PostWithContentDto } from "../../../types/post";
 
 export default function Post() {
   // useLocalSearchParams : 현재 페이지의 파라미터를 가져온다.
-  const { id, title, content } = useLocalSearchParams();
+  const { userId, id, title, body } = useLocalSearchParams();
 
   const [post, setPost] = useState<PostWithContentDto | null>(null);
 
   useEffect(() => {
     setPost({
+      userId: Number(userId),
       id: Number(id),
       title: title as string, // 타입을 명시적으로 지정
-      content: content as string,
+      body: body as string,
     });
   }, []);
 
@@ -29,14 +30,19 @@ export default function Post() {
   return (
     <View style={styles.postContainer}>
       <View style={styles.postInner}>
-        <Text style={styles.postTitle}>{post.title}</Text>
-        <Text style={styles.postContent}>{post.content}</Text>
+        <View style={styles.postHeader}>
+          <Text style={styles.postTitle}>제목</Text>
+          <Text style={styles.postTitleContent}>{post.title}</Text>
+        </View>
+        <View style={styles.postBodyContainer}>
+          <Text style={styles.postBody}>{post.body}</Text>
+        </View>
       </View>
     </View>
   );
 }
 
-const width = Dimensions.get("window").width;
+const WIDTH = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
   loadingContainer: {
@@ -53,25 +59,37 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   postInner: {
+    width: WIDTH - 15,
     padding: 16,
-    backgroundColor: "white",
-    marginBottom: 12,
-    borderRadius: 8,
+    borderRadius: 10,
+    backgroundColor: "#fff",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 2,
-    width: width - 16,
-    height: 100,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  postHeader: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    paddingVertical: 10,
   },
   postTitle: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 8,
   },
-  postContent: {
-    fontSize: 14,
-    color: "#666",
+  postTitleContent: {
+    fontSize: 16,
+    color: "#333",
+  },
+  postBodyContainer: {
+    marginTop: 5,
+  },
+  postBody: {
+    fontSize: 16,
+    marginTop: 5,
   },
 });
