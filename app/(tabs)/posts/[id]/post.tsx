@@ -1,21 +1,31 @@
+import { db } from "@/firebase/config";
 import { PostWithContentDto } from "@/types/post";
 import { useLocalSearchParams } from "expo-router";
+import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 
 export default function Post() {
   // useLocalSearchParams : 현재 페이지의 파라미터를 가져온다.
-  const { id, postId, title, content } = useLocalSearchParams();
+  const { id } = useLocalSearchParams();
 
   const [post, setPost] = useState<PostWithContentDto | null>(null);
 
   useEffect(() => {
-    setPost({
-      id: id as string,
-      postId: Number(postId),
-      title: title as string, // 타입을 명시적으로 지정
-      content: content as string,
-    });
+    const fetchPost = async () => {
+      try {
+        // firebase 문서 참조 방식이 효율적
+        const postSnap = await getDoc(doc(db, "posts", id as string));
+
+        if (postSnap.exists()) {
+          const post = postSnap.data() as PostWithContentDto;
+          setPost(post);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchPost();
   }, []);
 
   // 가드 클로즈 패턴

@@ -4,7 +4,13 @@ import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
 // type : 타입을 가져오기 위한 키워드
 import { db } from "@/firebase/config";
 import { PostDto } from "@/types/post";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  orderBy,
+  query,
+  Timestamp,
+} from "firebase/firestore";
 
 export default function Posts() {
   const [posts, setPosts] = useState<PostDto[] | null>(null);
@@ -20,11 +26,12 @@ export default function Posts() {
       const postsSnap = await getDocs(postsQuery);
 
       const postsData = postsSnap.docs.map((doc) => {
-        const { postId, title, content } = doc.data();
+        const { postId, createDate, title, content } = doc.data();
 
         return {
           id: doc.id, // doc.id : 문서의 ID
           postId: Number(postId),
+          createDate: createDate as Timestamp,
           title: title as string,
           content: content as string,
         };
@@ -65,8 +72,6 @@ export default function Posts() {
                   // params : 동적 라우팅을 위한 파라미터
                   id: item.id,
                   postId: item.postId,
-                  title: item.title,
-                  content: item.content,
                 },
               }}
             >
