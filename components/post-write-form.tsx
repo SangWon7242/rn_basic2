@@ -1,9 +1,9 @@
-import { Ionicons } from "@expo/vector-icons";
-import Octicons from "@expo/vector-icons/Octicons";
+import { Ionicons, Octicons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Alert,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -14,6 +14,39 @@ import {
   View,
 } from "react-native";
 
+const useKeyboardAware = (footerHeight: number) => {
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  // e.endCoordinates.height : 키보드가 완전히 올라왔을 때의 높이
+
+  useEffect(() => {
+    const showListener = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      (e) => {
+        setKeyboardVisible(true);
+        // 키보드 높이에서 footer 높이를 뺀 값을 사용
+        setKeyboardHeight(e.endCoordinates.height - footerHeight);
+      }
+    );
+
+    const hideListener = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => {
+        setKeyboardVisible(false);
+        setKeyboardHeight(footerHeight);
+      }
+    );
+
+    return () => {
+      showListener.remove();
+      hideListener.remove();
+    };
+  }, [footerHeight]); // footerHeight를 의존성 배열에 추가
+
+  return { keyboardVisible, keyboardHeight };
+};
+
 export default function PostWriteForm() {
   const router = useRouter();
 
@@ -21,6 +54,15 @@ export default function PostWriteForm() {
   const [error, setError] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
+
+  const [footerHeight, setFooterHeight] = useState<number>(0);
+
+  const onFooterLayout = (event: any) => {
+    const { height } = event.nativeEvent.layout;
+    setFooterHeight(height);
+  };
+
+  const { keyboardVisible, keyboardHeight } = useKeyboardAware(footerHeight);
 
   // useFocusEffect : 화면이 포커스 될 때마다 실행
   useFocusEffect(
@@ -96,9 +138,10 @@ export default function PostWriteForm() {
             </Pressable>
           </View>
         </View>
+
         <KeyboardAvoidingView
           style={styles.formBody}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
           keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
         >
           <ScrollView contentContainerStyle={styles.formBodyInner}>
@@ -106,10 +149,8 @@ export default function PostWriteForm() {
               <TextInput
                 style={styles.formTitleInput}
                 placeholder="제목을 입력해주세요."
-                autoFocus={false} // 자동으로 포커스를 주지 않음
-                showSoftInputOnFocus={true} // 키보드를 띄움
-                value={title}
-                onChangeText={setTitle}
+                autoFocus={false}
+                showSoftInputOnFocus={true}
               />
             </View>
             <View style={styles.formContentContainer}>
@@ -117,15 +158,19 @@ export default function PostWriteForm() {
                 style={styles.formContentInput}
                 placeholder="여러분의 이야기를 나눠주세요."
                 textAlignVertical="top"
-                autoFocus={false} // 자동으로 포커스를 주지 않음
-                showSoftInputOnFocus={true} // 키보드를 띄움
-                multiline // 여러 줄 입력 가능
-                value={content} // 입력값을 저장
-                onChangeText={setContent} // 입력값을 변경할 때 호출
+                autoFocus={false}
+                showSoftInputOnFocus={true}
+                multiline
               />
             </View>
           </ScrollView>
-          <View style={styles.contentFooter}>
+          <View
+            style={[
+              styles.contentFooter,
+              { marginBottom: keyboardVisible ? keyboardHeight : 0 },
+            ]}
+            onLayout={onFooterLayout}
+          >
             <Pressable style={styles.footerItem} onPress={selectImage}>
               <Ionicons name="camera-outline" size={20} color="black" />
               <Text style={styles.footerText}>사진</Text>
@@ -176,7 +221,7 @@ const styles = StyleSheet.create({
   formBody: {
     paddingTop: 10,
     marginHorizontal: 10,
-    flex: 1,
+    flexGrow: 1,
   },
   formBodyInner: {
     flex: 1,
@@ -188,6 +233,7 @@ const styles = StyleSheet.create({
   },
   formContentContainer: {
     flex: 1,
+    flexGrow: 1,
   },
   formContentInput: {
     fontSize: 13,
