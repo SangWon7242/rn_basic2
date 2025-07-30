@@ -1,8 +1,9 @@
 import { Ionicons, Octicons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
+  Animated,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -18,6 +19,10 @@ const useKeyboardAware = (footerHeight: number) => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
+  // new Animated.Value(0) : 애니메이션을 위한 초기값
+  // useRef : 애니메이션을 위한 초기값을 유지
+  const footerMarginAnim = useRef(new Animated.Value(0)).current;
+
   // e.endCoordinates.height : 키보드가 완전히 올라왔을 때의 높이
 
   useEffect(() => {
@@ -25,8 +30,16 @@ const useKeyboardAware = (footerHeight: number) => {
       Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
       (e) => {
         setKeyboardVisible(true);
+        const targetHeight = e.endCoordinates.height - footerHeight;
         // 키보드 높이에서 footer 높이를 뺀 값을 사용
-        setKeyboardHeight(e.endCoordinates.height - footerHeight);
+        setKeyboardHeight(targetHeight);
+
+        // 부드러운 애니메이션으로 marginBottom 조절
+        Animated.timing(footerMarginAnim, {
+          toValue: targetHeight,
+          duration: Platform.OS === "ios" ? 250 : 200, // ios는 250ms, android는 200ms
+          useNativeDriver: false, // layout 속성 변경이므로 false
+        }).start();
       }
     );
 
@@ -34,17 +47,24 @@ const useKeyboardAware = (footerHeight: number) => {
       Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
       () => {
         setKeyboardVisible(false);
-        setKeyboardHeight(footerHeight);
+        setKeyboardHeight(0);
+
+        // 부드러운 애니메이션으로 marginBottom을 0으로 복원
+        Animated.timing(footerMarginAnim, {
+          toValue: 0,
+          duration: Platform.OS === "ios" ? 250 : 200,
+          useNativeDriver: false,
+        }).start();
       }
     );
 
     return () => {
-      showListener.remove();
-      hideListener.remove();
+      showListener.remove(); // 키보드가 나타날 때의 리스너 제거
+      hideListener.remove(); // 키보드가 사라질 때의 리스너 제거
     };
-  }, [footerHeight]); // footerHeight를 의존성 배열에 추가
+  }, [footerHeight, footerMarginAnim]); // footerHeight를 의존성 배열에 추가
 
-  return { keyboardVisible, keyboardHeight };
+  return { keyboardVisible, keyboardHeight, footerMarginAnim };
 };
 
 export default function PostWriteForm() {
@@ -62,7 +82,8 @@ export default function PostWriteForm() {
     setFooterHeight(height);
   };
 
-  const { keyboardVisible, keyboardHeight } = useKeyboardAware(footerHeight);
+  const { keyboardVisible, keyboardHeight, footerMarginAnim } =
+    useKeyboardAware(footerHeight);
 
   // useFocusEffect : 화면이 포커스 될 때마다 실행
   useFocusEffect(
@@ -164,11 +185,8 @@ export default function PostWriteForm() {
               />
             </View>
           </ScrollView>
-          <View
-            style={[
-              styles.contentFooter,
-              { marginBottom: keyboardVisible ? keyboardHeight : 0 },
-            ]}
+          <Animated.View
+            style={[styles.contentFooter, { marginBottom: footerMarginAnim }]}
             onLayout={onFooterLayout}
           >
             <Pressable style={styles.footerItem} onPress={selectImage}>
@@ -179,7 +197,7 @@ export default function PostWriteForm() {
               <Octicons name="hash" size={20} color="black" />
               <Text style={styles.footerText}>해시태그</Text>
             </Pressable>
-          </View>
+          </Animated.View>
         </KeyboardAvoidingView>
       </View>
     </View>
