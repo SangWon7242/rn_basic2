@@ -6,7 +6,7 @@ import { db } from "@/firebase/config";
 import { PostDto } from "@/types/post";
 import {
   collection,
-  getDocs,
+  onSnapshot,
   orderBy,
   query,
   Timestamp,
@@ -23,6 +23,7 @@ export default function Posts() {
       );
 
       // postsSnap : posts 컬렉션의 데이터를 가져온다.
+      /*
       const postsSnap = await getDocs(postsQuery);
 
       const postsData = postsSnap.docs.map((doc) => {
@@ -36,8 +37,29 @@ export default function Posts() {
           content: content as string,
         };
       });
+      */
 
-      setPosts(postsData);
+      // await onSnapshot : posts 컬렉션의 데이터를 실시간으로 가져온다.
+      // snapshot : posts 컬렉션의 데이터를 가져온다.
+      await onSnapshot(postsQuery, (snapshot) => {
+        // postsData : 마지막 스냅샷 이후를 배열로 생성
+        // 생성, 삭제, 수정을 실시간으로 반영
+        const postsData = snapshot.docs.map((doc) => {
+          const { postId, createDate, title, content } = doc.data();
+
+          return {
+            id: doc.id, // doc.id : 문서의 ID
+            postId: Number(postId),
+            createDate: createDate as Timestamp,
+            title: title as string,
+            content: content as string,
+          };
+        });
+        // 이렇게 하면 문서를 한번만 가져오는 것이 아니라
+        // 생성, 삭제, 수정을 실시간으로 반영한다.
+
+        setPosts(postsData);
+      });
     } catch (error) {
       console.error(error);
     }

@@ -114,7 +114,7 @@ export default function PostWriteForm() {
   const onSubmit = useCallback(() => {
     if (!validateForm()) {
       // 오류가 있으면 알림 표시
-      Alert.alert("입력 오류", error);
+      Alert.alert(error);
       return;
     }
 
@@ -172,6 +172,8 @@ export default function PostWriteForm() {
                 placeholder="제목을 입력해주세요."
                 autoFocus={false}
                 showSoftInputOnFocus={true}
+                value={title}
+                onChangeText={setTitle}
               />
             </View>
             <View style={styles.formContentContainer}>
@@ -182,6 +184,8 @@ export default function PostWriteForm() {
                 autoFocus={false}
                 showSoftInputOnFocus={true}
                 multiline
+                value={content}
+                onChangeText={setContent}
               />
             </View>
           </ScrollView>
