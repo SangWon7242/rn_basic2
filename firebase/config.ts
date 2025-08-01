@@ -10,6 +10,7 @@ import { getFirestore } from "firebase/firestore";
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
   authDomain: "simplepost-aa947.firebaseapp.com",
+  databaseURL: "https://simplepost-aa947-default-rtdb.firebaseio.com",
   projectId: "simplepost-aa947",
   storageBucket: "simplepost-aa947.firebasestorage.app",
   messagingSenderId: "71789732832",
