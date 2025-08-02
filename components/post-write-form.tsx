@@ -1,5 +1,7 @@
+import { db } from "@/firebase/config";
 import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
+import { addDoc, collection } from "firebase/firestore";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
@@ -127,8 +129,30 @@ export default function PostWriteForm() {
   }, [title, content]);
 
   // e: React.FormEvent <form> 태그의 이벤트
-  const onSubmit = useCallback(() => {
+  const onSubmit = useCallback(async () => {
     if (validateForm()) {
+      try {
+        setIsLoading(true);
+
+        await addDoc(collection(db, "posts"), {
+          title: title.trim(),
+          content: content.trim(),
+          createdAt: Date.now(),
+        });
+
+        console.log("문서가 성공적으로 저장되었습니다.");
+
+        // 폼 초기화 및 페이지 이동
+        setTitle("");
+        setContent("");
+        setError("");
+
+        Alert.alert("성공", "게시글이 등록되었습니다.");
+        router.navigate("/(tabs)/posts/page");
+      } catch (error) {
+        console.error(error);
+      }
+
       console.log("제출된 데이터:", { title, content });
     }
 

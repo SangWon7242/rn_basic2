@@ -19,25 +19,8 @@ export default function Posts() {
     try {
       const postsQuery = query(
         collection(db, "posts"), // collection : posts 컬렉션을 가져온다.
-        orderBy("postId", "desc") // orderBy : id를 기준으로 내림차순 정렬
+        orderBy("createDate", "desc") // orderBy : id를 기준으로 내림차순 정렬
       );
-
-      // postsSnap : posts 컬렉션의 데이터를 가져온다.
-      /*
-      const postsSnap = await getDocs(postsQuery);
-
-      const postsData = postsSnap.docs.map((doc) => {
-        const { postId, createDate, title, content } = doc.data();
-
-        return {
-          id: doc.id, // doc.id : 문서의 ID
-          postId: Number(postId),
-          createDate: createDate as Timestamp,
-          title: title as string,
-          content: content as string,
-        };
-      });
-      */
 
       // await onSnapshot : posts 컬렉션의 데이터를 실시간으로 가져온다.
       // snapshot : posts 컬렉션의 데이터를 가져온다.
@@ -45,11 +28,10 @@ export default function Posts() {
         // postsData : 마지막 스냅샷 이후를 배열로 생성
         // 생성, 삭제, 수정을 실시간으로 반영
         const postsData = snapshot.docs.map((doc) => {
-          const { postId, createDate, title, content } = doc.data();
+          const { createDate, title, content } = doc.data();
 
           return {
             id: doc.id, // doc.id : 문서의 ID
-            postId: Number(postId),
             createDate: createDate as Timestamp,
             title: title as string,
             content: content as string,
@@ -86,18 +68,19 @@ export default function Posts() {
         contentContainerStyle={styles.listWrap}
         renderItem={({ item }) => (
           <View style={styles.postItem}>
-            <Text style={styles.postId}>{item.postId}번 게시글</Text>
             <Link
+              style={styles.postLink}
               href={{
                 pathname: `/posts/[id]/post`, // [id] : 동적 라우팅
                 params: {
-                  // params : 동적 라우팅을 위한 파라미터
                   id: item.id,
-                  postId: item.postId,
                 },
               }}
             >
-              <Text style={styles.postTitle}>{item.title}</Text>
+              <View style={styles.postLinkWrap}>
+                <Text style={styles.postTitle}>{item.title}</Text>
+                <Text style={styles.postContent}>{item.content}</Text>
+              </View>
             </Link>
           </View>
         )}
@@ -130,7 +113,6 @@ const styles = StyleSheet.create({
   },
   postItem: {
     backgroundColor: "#fff",
-    padding: 16,
     borderRadius: 10,
     marginBottom: 10,
     shadowColor: "#000",
@@ -141,14 +123,21 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-    height: 100,
   },
-  postId: {
-    fontSize: 16,
-    fontWeight: "bold",
+  postLink: {
+    flex: 1,
+    padding: 16,
+  },
+  postLinkWrap: {
+    flexDirection: "column",
   },
   postTitle: {
     fontSize: 16,
     marginTop: 5,
+  },
+  postContent: {
+    fontSize: 14,
+    marginTop: 5,
+    color: "gray",
   },
 });
