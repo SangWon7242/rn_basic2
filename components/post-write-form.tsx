@@ -1,7 +1,7 @@
 import { db } from "@/firebase/config";
 import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, Timestamp } from "firebase/firestore";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
@@ -137,7 +137,7 @@ export default function PostWriteForm() {
         await addDoc(collection(db, "posts"), {
           title: title.trim(),
           content: content.trim(),
-          createdAt: Date.now(),
+          createDate: Timestamp.now(),
         });
 
         console.log("문서가 성공적으로 저장되었습니다.");
