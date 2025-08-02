@@ -43,6 +43,7 @@ export default function TabLayout() {
         name="write"
         options={{
           title: "글쓰기",
+          tabBarStyle: { display: "none" },
           tabBarIcon: ({ focused }) => (
             <Ionicons
               name="add-outline"
