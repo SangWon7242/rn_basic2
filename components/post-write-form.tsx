@@ -112,10 +112,13 @@ export default function PostWriteForm() {
   const validateForm = useCallback(() => {
     if (!title.trim()) {
       setError("제목을 입력해주세요");
+      Alert.alert(error);
       return false;
     }
+
     if (!content.trim()) {
       setError("내용을 입력해주세요");
+      Alert.alert(error);
       return false;
     }
 
@@ -123,14 +126,18 @@ export default function PostWriteForm() {
     return true;
   }, [title, content]);
 
+  // e: React.FormEvent <form> 태그의 이벤트
   const onSubmit = useCallback(() => {
-    if (!validateForm()) {
-      // 오류가 있으면 알림 표시
-      Alert.alert(error);
-      return;
+    if (validateForm()) {
+      console.log("제출된 데이터:", { title, content });
     }
 
-    console.log("제출된 데이터:", { title, content });
+    setTitle("");
+    setContent("");
+    setIsLoading(false);
+    setError("");
+
+    router.navigate("/(tabs)/posts/page");
   }, [title, content]);
 
   const selectCategory = useCallback(() => {
@@ -143,6 +150,14 @@ export default function PostWriteForm() {
 
   const selectHashtag = useCallback(() => {
     console.log("해시태그 선택");
+  }, []);
+
+  const selectLocation = useCallback(() => {
+    console.log("장소 선택");
+  }, []);
+
+  const selectVote = useCallback(() => {
+    console.log("투표 선택");
   }, []);
 
   if (isLoading) {
@@ -163,13 +178,13 @@ export default function PostWriteForm() {
           >
             <Ionicons name="close" size={28} color="white" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.completeButton}>
+          <TouchableOpacity style={styles.completeButton} onPress={onSubmit}>
             <Text style={styles.completeButtonText}>완료</Text>
           </TouchableOpacity>
         </View>
 
         {/* 주제 선택 영역 */}
-        <TouchableOpacity style={styles.topicSelector}>
+        <TouchableOpacity style={styles.topicSelector} onPress={selectCategory}>
           <Text style={styles.topicText}>게시글의 주제를 선택해주세요.</Text>
           <Ionicons name="chevron-forward" size={24} color="white" />
         </TouchableOpacity>
@@ -207,19 +222,25 @@ export default function PostWriteForm() {
           ]}
           onLayout={onToolBarLayout}
         >
-          <TouchableOpacity style={styles.toolbarButton}>
+          <TouchableOpacity style={styles.toolbarButton} onPress={selectImage}>
             <Ionicons name="image-outline" size={24} color="white" />
             <Text style={styles.toolbarText}>사진</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.toolbarButton}>
+          <TouchableOpacity
+            style={styles.toolbarButton}
+            onPress={selectLocation}
+          >
             <Ionicons name="location-outline" size={24} color="white" />
             <Text style={styles.toolbarText}>장소</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.toolbarButton}>
+          <TouchableOpacity style={styles.toolbarButton} onPress={selectVote}>
             <MaterialIcons name="how-to-vote" size={24} color="white" />
             <Text style={styles.toolbarText}>투표</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.toolbarButton}>
+          <TouchableOpacity
+            style={styles.toolbarButton}
+            onPress={selectHashtag}
+          >
             <FontAwesome name="hashtag" size={24} color="white" />
             <Text style={styles.toolbarText}>태그</Text>
           </TouchableOpacity>
