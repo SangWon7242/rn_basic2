@@ -1,4 +1,6 @@
 // screens/WelcomeScreen.tsx
+import CreateAccountForm from "@/components/forms/CreateAccountForm";
+import LoginForm from "@/components/forms/LoginForm";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -12,7 +14,26 @@ import {
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const [showCreateAccountForm, setShowCreateAccountForm] = useState(false);
   const [showLoginForm, setShowLoginForm] = useState(false);
+
+  if (showCreateAccountForm) {
+    return (
+      <CreateAccountForm
+        onBack={() => setShowCreateAccountForm(false)}
+        onSuccess={() => setShowCreateAccountForm(false)}
+      />
+    );
+  }
+
+  if (showLoginForm) {
+    return (
+      <LoginForm
+        onSubmit={() => setShowLoginForm(false)}
+        onBack={() => setShowCreateAccountForm(false)}
+      />
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -40,7 +61,7 @@ export default function WelcomeScreen() {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.startButton}
-            onPress={() => router.push("/(tabs)/home")}
+            onPress={() => setShowCreateAccountForm(true)}
           >
             <Text style={styles.startButtonText}>시작하기</Text>
           </TouchableOpacity>
