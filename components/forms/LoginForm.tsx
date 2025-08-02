@@ -1,4 +1,7 @@
+import { auth } from "@/firebase/config";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -12,17 +15,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 interface LoginFormProps {
-  onSubmit: (email: string, password: string, isSignUp: boolean) => void;
   onBack: () => void;
   onSignUp: () => void;
 }
 
-export default function LoginForm({
-  onSubmit,
-  onBack,
-  onSignUp,
-}: LoginFormProps) {
+export default function LoginForm({ onBack, onSignUp }: LoginFormProps) {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -48,6 +48,42 @@ export default function LoginForm({
     }
 
     return true;
+  };
+
+  // 🔥 로그인 처리 함수
+  const handleLogin = async (email: string, password: string) => {
+    if (!validateForm()) return;
+
+    setLoading(true);
+
+    try {
+      // 로그인
+      await signInWithEmailAndPassword(auth, email, password);
+      console.log("로그인 성공");
+      // 메인 화면으로 이동 또는 상태 업데이트
+      router.replace("/(tabs)/home");
+    } catch (error: any) {
+      let errorMessage = "로그인 중 오류가 발생했습니다.";
+
+      switch (error.code) {
+        case "auth/user-not-found":
+          errorMessage = "등록되지 않은 이메일입니다.";
+          break;
+        case "auth/wrong-password":
+          errorMessage = "비밀번호가 올바르지 않습니다.";
+          break;
+        case "auth/invalid-email":
+          errorMessage = "올바르지 않은 이메일 형식입니다.";
+          break;
+        case "auth/too-many-requests":
+          errorMessage = "너무 많은 시도로 인해 잠시 후 다시 시도해주세요.";
+          break;
+      }
+
+      Alert.alert("로그인 실패", errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -132,7 +168,7 @@ export default function LoginForm({
           {/* 로그인 버튼 */}
           <TouchableOpacity
             style={[styles.loginButton, loading && styles.disabledButton]}
-            onPress={() => onSubmit(email, password, false)}
+            onPress={() => handleLogin(email, password)}
             disabled={loading}
           >
             {loading ? (

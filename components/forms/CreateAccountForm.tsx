@@ -1,5 +1,6 @@
 import { auth } from "@/firebase/config";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import {
@@ -18,15 +19,14 @@ import {
 
 interface SignUpScreenProps {
   onBack: () => void;
-  onSuccess: (email: string, password: string) => void;
   onLogin: () => void;
 }
 
 export default function CreateAccountForm({
   onBack,
-  onSuccess,
   onLogin,
 }: SignUpScreenProps) {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -81,7 +81,7 @@ export default function CreateAccountForm({
   };
 
   // 회원가입 처리
-  const handleSignUp = async () => {
+  const handleSignUp = async (email: string, password: string) => {
     if (!validateForm()) return;
 
     setLoading(true);
@@ -95,9 +95,8 @@ export default function CreateAccountForm({
       );
       await updateProfile(credential.user, { displayName: email });
       // 🔥 회원가입 완료 후 이메일과 비밀번호를 전달하여 자동 로그인
-      Alert.alert("회원가입 완료", "회원가입이 완료되었습니다!", [
-        { text: "확인", onPress: () => onSuccess(email, password) },
-      ]);
+      Alert.alert("회원가입 완료", "회원가입이 완료되었습니다!");
+      router.replace("/(tabs)/home");
     } catch (error: any) {
       let errorMessage = "회원가입 중 오류가 발생했습니다.";
 
@@ -256,7 +255,7 @@ export default function CreateAccountForm({
                 (!email || !password || !confirmPassword || loading) &&
                   styles.signUpButtonDisabled,
               ]}
-              onPress={handleSignUp}
+              onPress={() => handleSignUp(email, password)}
               disabled={!email || !password || !confirmPassword || loading}
             >
               {loading ? (
