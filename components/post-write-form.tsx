@@ -112,57 +112,46 @@ export default function PostWriteForm() {
 
   // 폼 유효성 검사
   const validateForm = useCallback(() => {
-    if (!title.trim()) {
-      setError("제목을 입력해주세요");
-      Alert.alert(error);
+    if (!title.trim() || title.length == 0) {
+      Alert.alert("제목을 입력해주세요");
       return false;
     }
 
-    if (!content.trim()) {
-      setError("내용을 입력해주세요");
-      Alert.alert(error);
+    if (!content.trim() || content.length == 0) {
+      Alert.alert("내용을 입력해주세요");
       return false;
     }
 
-    setError("");
     return true;
   }, [title, content]);
 
-  // e: React.FormEvent <form> 태그의 이벤트
   const onSubmit = useCallback(async () => {
-    if (validateForm()) {
-      try {
-        setIsLoading(true);
+    if (!validateForm()) return;
 
-        await addDoc(collection(db, "posts"), {
-          title: title.trim(),
-          content: content.trim(),
-          createDate: Timestamp.now(),
-        });
+    try {
+      setIsLoading(true);
 
-        console.log("문서가 성공적으로 저장되었습니다.");
+      await addDoc(collection(db, "posts"), {
+        title: title.trim(),
+        content: content.trim(),
+        createDate: Timestamp.now(),
+      });
 
-        // 폼 초기화 및 페이지 이동
-        setTitle("");
-        setContent("");
-        setError("");
+      console.log("문서가 성공적으로 저장되었습니다.");
 
-        Alert.alert("성공", "게시글이 등록되었습니다.");
-        router.navigate("/(tabs)/posts/page");
-      } catch (error) {
-        console.error(error);
-      }
+      // 폼 초기화 및 페이지 이동
+      setTitle("");
+      setContent("");
+      setError("");
 
-      console.log("제출된 데이터:", { title, content });
+      Alert.alert("성공", "게시글이 등록되었습니다.");
+      router.navigate("/(tabs)/posts/page");
+    } catch (error) {
+      console.error(error);
+      Alert.alert("에러", "게시글 등록에 실패했습니다.");
+      setIsLoading(false);
     }
-
-    setTitle("");
-    setContent("");
-    setIsLoading(false);
-    setError("");
-
-    router.navigate("/(tabs)/posts/page");
-  }, [title, content]);
+  }, [title, content, validateForm]);
 
   const selectCategory = useCallback(() => {
     console.log("카테고리 선택");
