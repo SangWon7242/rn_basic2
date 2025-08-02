@@ -1,6 +1,6 @@
 import { auth } from "@/firebase/config";
 import { Ionicons } from "@expo/vector-icons";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -18,7 +18,7 @@ import {
 
 interface SignUpScreenProps {
   onBack: () => void;
-  onSuccess: () => void;
+  onSuccess: (email: string, password: string) => void;
 }
 
 export default function CreateAccountForm({
@@ -84,9 +84,17 @@ export default function CreateAccountForm({
 
     setLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      // 회원가입
+      // createUserWithEmailAndPassword : 이메일과 비밀번호로 회원가입
+      const credential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      await updateProfile(credential.user, { displayName: email });
+      // 🔥 회원가입 완료 후 이메일과 비밀번호를 전달하여 자동 로그인
       Alert.alert("회원가입 완료", "회원가입이 완료되었습니다!", [
-        { text: "확인", onPress: onSuccess },
+        { text: "확인", onPress: () => onSuccess(email, password) },
       ]);
     } catch (error: any) {
       let errorMessage = "회원가입 중 오류가 발생했습니다.";

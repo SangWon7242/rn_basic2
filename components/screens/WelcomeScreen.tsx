@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  Alert,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -17,11 +18,27 @@ export default function WelcomeScreen() {
   const [showCreateAccountForm, setShowCreateAccountForm] = useState(false);
   const [showLoginForm, setShowLoginForm] = useState(false);
 
+  const handleSignUpSuccess = async (email: string, password: string) => {
+    try {
+      // Firebase는 회원가입 시 자동으로 로그인 상태가 됨
+      console.log("회원가입 성공, 자동 로그인됨");
+      setShowCreateAccountForm(false);
+      // 메인 화면으로 이동
+      router.replace("/(tabs)/home");
+    } catch (error: any) {
+      console.error("회원가입 후 처리 오류:", error);
+      Alert.alert(
+        "오류",
+        "회원가입은 완료되었지만 로그인 처리 중 오류가 발생했습니다."
+      );
+    }
+  };
+
   if (showCreateAccountForm) {
     return (
       <CreateAccountForm
         onBack={() => setShowCreateAccountForm(false)}
-        onSuccess={() => setShowCreateAccountForm(false)}
+        onSuccess={handleSignUpSuccess}
       />
     );
   }
