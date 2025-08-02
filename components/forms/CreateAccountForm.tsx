@@ -19,11 +19,13 @@ import {
 interface SignUpScreenProps {
   onBack: () => void;
   onSuccess: (email: string, password: string) => void;
+  onLogin: () => void;
 }
 
 export default function CreateAccountForm({
   onBack,
   onSuccess,
+  onLogin,
 }: SignUpScreenProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -267,7 +269,7 @@ export default function CreateAccountForm({
             {/* 로그인 링크 */}
             <TouchableOpacity
               style={styles.loginLink}
-              onPress={() => console.log("로그인")}
+              onPress={() => onLogin()}
             >
               <Text style={styles.loginLinkText}>
                 이미 계정이 있나요?{" "}

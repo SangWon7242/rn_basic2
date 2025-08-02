@@ -1,8 +1,10 @@
 // screens/WelcomeScreen.tsx
 import CreateAccountForm from "@/components/forms/CreateAccountForm";
 import LoginForm from "@/components/forms/LoginForm";
+import { auth } from "@/firebase/config";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import {
   Alert,
@@ -34,11 +36,45 @@ export default function WelcomeScreen() {
     }
   };
 
+  // 🔥 로그인 처리 함수
+  const handleEmailLogin = async (email: string, password: string) => {
+    try {
+      // 로그인
+      await signInWithEmailAndPassword(auth, email, password);
+      console.log("로그인 성공");
+      // 메인 화면으로 이동 또는 상태 업데이트
+      router.replace("/(tabs)/home");
+    } catch (error: any) {
+      let errorMessage = "로그인 중 오류가 발생했습니다.";
+
+      switch (error.code) {
+        case "auth/user-not-found":
+          errorMessage = "등록되지 않은 이메일입니다.";
+          break;
+        case "auth/wrong-password":
+          errorMessage = "비밀번호가 올바르지 않습니다.";
+          break;
+        case "auth/invalid-email":
+          errorMessage = "올바르지 않은 이메일 형식입니다.";
+          break;
+        case "auth/too-many-requests":
+          errorMessage = "너무 많은 시도로 인해 잠시 후 다시 시도해주세요.";
+          break;
+      }
+
+      Alert.alert("로그인 실패", errorMessage);
+    }
+  };
+
   if (showCreateAccountForm) {
     return (
       <CreateAccountForm
         onBack={() => setShowCreateAccountForm(false)}
         onSuccess={handleSignUpSuccess}
+        onLogin={() => {
+          setShowLoginForm(true);
+          setShowCreateAccountForm(false);
+        }}
       />
     );
   }
@@ -46,8 +82,12 @@ export default function WelcomeScreen() {
   if (showLoginForm) {
     return (
       <LoginForm
-        onSubmit={() => setShowLoginForm(false)}
-        onBack={() => setShowCreateAccountForm(false)}
+        onSubmit={handleEmailLogin}
+        onBack={() => setShowLoginForm(false)}
+        onSignUp={() => {
+          setShowLoginForm(false);
+          setShowCreateAccountForm(true);
+        }}
       />
     );
   }
